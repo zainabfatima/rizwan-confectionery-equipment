@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://rizwanconfectionery.com
+
+# Sitemaps
+Sitemap: https://rizwanconfectionery.com/sitemap.xml

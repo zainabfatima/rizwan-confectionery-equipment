@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #faf5ee;
+  background-image: radial-gradient(ellipse at top, rgba(200, 137, 59, 0.14), transparent 46%);
+  color: #1f1f1f;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+:focus-visible {
+  outline: 2px solid #c8893b;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition duration-200;
+  }
+
+  .btn-primary {
+    @apply bg-caramel text-chocolate hover:bg-[#d6a15a];
+  }
+
+  .btn-dark {
+    @apply bg-chocolate text-cream hover:bg-cocoa;
+  }
+
+  .btn-line {
+    @apply border border-chocolate/20 bg-white text-chocolate hover:border-caramel;
+  }
+
+  .btn-line-light {
+    @apply border border-cream/50 text-cream hover:bg-cream/10;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-chocolate/15 bg-white px-3 py-3 text-base text-charcoal shadow-sm outline-none ring-caramel/40 placeholder:text-cocoa/50 focus:border-caramel focus:ring-2;
+  }
+
+  .card {
+    @apply rounded-2xl bg-white shadow-card ring-1 ring-chocolate/5;
+  }
+}
