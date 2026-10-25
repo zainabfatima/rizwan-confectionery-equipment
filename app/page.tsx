@@ -28,41 +28,23 @@ export default function HomePage() {
 
   return (
     <>
-      <section className="relative min-h-[88vh] overflow-hidden bg-chocolate text-cream">
-        {hero ? (
-          <MachineImage
-            src={hero.src}
-            alt={hero.alt}
-            sizes="100vw"
-            priority
-            className="object-cover object-center"
-          />
-        ) : null}
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-chocolate/80 to-chocolate/20" />
-        <div className="relative z-10 mx-auto flex min-h-[88vh] max-w-page flex-col justify-end px-4 py-16 md:justify-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-caramel">{site.hero.eyebrow}</p>
-          <h1 className="mt-4 max-w-3xl font-serif text-4xl leading-tight md:text-6xl">{site.hero.headline}</h1>
-          <p className="mt-5 max-w-2xl text-lg text-cream/85">{site.hero.subhead}</p>
-          <ul className="mt-6 flex flex-wrap gap-2" aria-label="Confectionery types">
-            {finishedProducts.map((product) => (
-              <li key={product.label}>
-                <a href={product.href} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm text-cream ring-1 ring-cream/30 hover:bg-white/20">
-                  <span className={`h-2.5 w-2.5 rounded-full ${product.swatch}`} aria-hidden="true" />
-                  {product.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/machines" className="btn btn-primary">
-              {site.hero.primaryCta}
-            </Link>
-            <Link href="/quote" className="btn btn-line-light">
-              {site.hero.secondaryCta}
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HeroReel
+        slides={featured.map(
+          (machine): HeroSlide => ({
+            slug: machine.slug,
+            category: machine.category,
+            name: machine.name,
+            summary: machine.summary,
+            capacityLabel: machine.capacityLabel,
+            applications: machine.applications,
+            images: machine.images.map((image) => ({ src: image.src, alt: image.alt })),
+            video: machine.videos[0] ?? null,
+          }),
+        )}
+        eyebrow={site.hero.eyebrow}
+        headline={site.hero.headline}
+        subhead={site.hero.subhead}
+      />
 
       <section className="border-b border-chocolate/10 bg-white" aria-label="Manufacturer context">
         <ul className="mx-auto grid max-w-page gap-4 px-4 py-6 text-sm sm:grid-cols-2 lg:grid-cols-4">
