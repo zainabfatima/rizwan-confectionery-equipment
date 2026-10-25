@@ -10,8 +10,9 @@ export function Footer() {
         <div className="md:col-span-1">
           <p className="font-serif text-2xl">Rizwan</p>
           <p className="mt-2 text-sm text-cream/80">
-            Authorized MEMAK confectionery equipment for plants in the United States.
+            Chocolate, gummy, caramel, nougat, and bar machines for plants in the United States.
           </p>
+          <p className="mt-2 text-xs text-cream/70">Equipment from MEMAK Machinery.</p>
           <a className="mt-4 inline-block text-sm underline decoration-caramel underline-offset-4" href={`mailto:${site.email}`}>
             {site.email}
           </a>

@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: "Authorized MEMAK Confectionery Equipment for North America",
+    default: site.hero.headline,
     template: "%s | Rizwan Confectionery Equipment",
   },
   description: site.description,
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: site.name,
-    title: "Authorized MEMAK Confectionery Equipment for North America",
+    title: site.hero.headline,
     description: site.description,
   },
   twitter: { card: "summary_large_image" },

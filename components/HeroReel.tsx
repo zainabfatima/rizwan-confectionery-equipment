@@ -12,6 +12,7 @@ export type HeroSlide = {
   summary: string;
   capacityLabel: string;
   applications: string[];
+  features: string[];
   images: { src: string; alt: string }[];
   video: { title: string; url: string } | null;
 };
@@ -23,22 +24,32 @@ function displayName(name: string) {
 }
 
 function videoKind(url: string) {
-  if (/\.(mp4|webm|ogg)(\?|$)/i.test(url)) return "file" as const;
+  if (/\.(mp4|webm|ogg)(\?|$)/i.test(url)) return { kind: "file" as const, src: url };
   try {
     const parsed = new URL(url);
     if (parsed.hostname.includes("youtu.be")) {
       const id = parsed.pathname.replace("/", "");
-      return { type: "youtube" as const, src: `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0` };
+      if (!id) return null;
+      return {
+        kind: "embed" as const,
+        src: `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0`,
+      };
     }
     if (parsed.hostname.includes("youtube.com")) {
       const id = parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop() || "";
       if (!id) return null;
-      return { type: "youtube" as const, src: `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0` };
+      return {
+        kind: "embed" as const,
+        src: `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&rel=0`,
+      };
     }
     if (parsed.hostname.includes("vimeo.com")) {
       const id = parsed.pathname.split("/").filter(Boolean).pop();
-      if (!id) return null;
-      return { type: "vimeo" as const, src: `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&background=1` };
+      if (!id || id === "video") return null;
+      return {
+        kind: "embed" as const,
+        src: `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&background=1`,
+      };
     }
   } catch {
     return null;
@@ -46,23 +57,36 @@ function videoKind(url: string) {
   return null;
 }
 
+function explanationLines(slide: HeroSlide) {
+  const does = slide.features.find((feature) => feature.trim()) || slide.summary;
+  const uses = slide.applications.map((item) => item.trim()).filter(Boolean).slice(0, 4);
+  return [
+    { label: "What it does", text: does },
+    { label: "Used for", text: uses.length ? uses.join(", ") : slide.summary },
+  ];
+}
+
 export function HeroReel({
   slides,
   eyebrow,
   headline,
   subhead,
+  credit,
 }: {
   slides: HeroSlide[];
   eyebrow: string;
   headline: string;
   subhead: string;
+  credit: string;
 }) {
   const reduce = useReducedMotion();
+  const allowMotion = reduce === false;
   const [index, setIndex] = useState(0);
   const [photo, setPhoto] = useState(0);
+  const [beat, setBeat] = useState(0);
   const [manualPause, setManualPause] = useState(false);
   const [hoverPause, setHoverPause] = useState(false);
-  const paused = Boolean(reduce) || manualPause || hoverPause;
+  const paused = !allowMotion || manualPause || hoverPause;
   const slide = slides[index];
 
   useEffect(() => {
@@ -70,30 +94,36 @@ export function HeroReel({
     const timer = window.setInterval(() => {
       setIndex((current) => (current + 1) % slides.length);
       setPhoto(0);
+      setBeat(0);
     }, 6000);
     return () => window.clearInterval(timer);
   }, [paused, slides.length]);
 
   useEffect(() => {
-    const count = slides[index]?.images.length ?? 0;
-    if (paused || count < 2 || slide?.video) return;
+    const current = slides[index];
+    const count = current?.images.length ?? 0;
+    const hasVideo = Boolean(current?.video && videoKind(current.video.url));
+    if (paused) return;
     const timer = window.setInterval(() => {
-      setPhoto((current) => (current + 1) % count);
+      setBeat((value) => value + 1);
+      if (!hasVideo && count > 1) setPhoto((currentPhoto) => (currentPhoto + 1) % count);
     }, 3000);
     return () => window.clearInterval(timer);
-  }, [paused, index, slide?.video, slides]);
+  }, [paused, index, slides]);
 
   if (!slide) return null;
 
   const name = displayName(slide.name);
-  const image = slide.images[photo] ?? slide.images[0];
   const uses = slide.applications.slice(0, 4);
-  const video = slide.video ? videoKind(slide.video.url) : null;
+  const lines = explanationLines(slide);
+  const playback = allowMotion && slide.video ? videoKind(slide.video.url) : null;
   const href = `/machines/${slide.category}/${slide.slug}`;
+  const activeLine = allowMotion ? beat % 2 : -1;
 
   function show(next: number) {
-    setIndex((next + slides.length) % slides.length);
+    setBeat(0);
     setPhoto(0);
+    setIndex((next + slides.length) % slides.length);
   }
 
   function hold(node: HTMLElement, active: boolean) {
@@ -102,10 +132,10 @@ export function HeroReel({
 
   return (
     <section
-      className="relative overflow-x-clip bg-charcoal text-cream"
+      className="relative isolate overflow-x-clip bg-charcoal text-cream md:min-h-[calc(100svh-7.5rem)]"
       role="region"
       aria-roledescription="carousel"
-      aria-label="Featured confectionery machines"
+      aria-label="Machines in motion"
       tabIndex={0}
       onMouseEnter={(event) => hold(event.currentTarget, true)}
       onMouseLeave={(event) => hold(event.currentTarget, false)}
@@ -123,62 +153,83 @@ export function HeroReel({
       }}
     >
       <div className="absolute inset-0 overflow-hidden">
-        {video && video !== "file" ? (
+        {playback?.kind === "embed" ? (
           <iframe
-            key={video.src}
+            key={playback.src}
             title={slide.video?.title || name}
-            src={video.src}
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[100vw] min-w-full max-w-none -translate-x-1/2 -translate-y-1/2 sm:w-[177.78vh]"
+            src={playback.src}
+            className="pointer-events-none absolute left-1/2 top-1/2 aspect-video min-h-full w-[177.78%] min-w-full -translate-x-1/2 -translate-y-1/2"
             allow="autoplay; encrypted-media; picture-in-picture"
             tabIndex={-1}
           />
         ) : null}
-        {slide.video && videoKind(slide.video.url) === "file" ? (
+        {playback?.kind === "file" ? (
           <video
-            key={slide.video.url}
+            key={playback.src}
             className="h-full w-full object-cover"
             autoPlay
             muted
             loop
             playsInline
-            aria-label={slide.video.title || name}
+            aria-label={slide.video?.title || name}
           >
-            <source src={slide.video.url} />
+            <source src={playback.src} />
           </video>
         ) : null}
-        {!video && image ? (
-          <div key={`${slide.slug}-${image.src}`} className="absolute inset-0">
-            <MachineImage
-              src={image.src}
-              alt={image.alt}
-              sizes="100vw"
-              priority={index === 0 && photo === 0}
-              className={`object-cover object-center ${reduce ? "" : "hero-kenburns"}`}
-            />
-          </div>
-        ) : null}
+        {!playback
+          ? slide.images.map((image, imageIndex) => {
+              const active = imageIndex === photo;
+              return (
+                <div
+                  key={`${slide.slug}-${image.src}`}
+                  className={`hero-crossfade absolute inset-0 ${active ? "opacity-100" : "opacity-0"}`}
+                  aria-hidden={!active}
+                >
+                  <MachineImage
+                    src={image.src}
+                    alt=""
+                    sizes="100vw"
+                    priority={index === 0 && imageIndex === 0}
+                    className={`object-cover object-center ${active && allowMotion ? "hero-kenburns" : ""}`}
+                  />
+                </div>
+              );
+            })
+          : null}
       </div>
-      <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-charcoal/80 to-charcoal/35" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-charcoal/90 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-charcoal/88 to-charcoal/30" />
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-charcoal to-transparent" />
 
-      <div className="relative z-10 mx-auto flex max-w-page flex-col justify-between gap-8 px-4 pb-28 pt-8 md:min-h-[88vh] md:py-16">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-caramel sm:tracking-[0.2em]">{eyebrow}</p>
-          <h1 className="mt-4 max-w-4xl font-serif text-3xl leading-tight sm:text-4xl md:text-6xl">{headline}</h1>
-          {index === 0 ? <p className="mt-5 max-w-2xl text-base leading-7 text-cream/90 sm:text-lg">{subhead}</p> : null}
+      <div className="relative z-10 mx-auto flex max-w-page flex-col justify-between gap-8 px-4 pb-8 pt-8 md:min-h-[calc(100svh-7.5rem)] md:py-12">
+        <div className="max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-caramel sm:tracking-[0.18em]">{eyebrow}</p>
+          <h1 className="mt-3 max-w-4xl text-balance font-serif text-3xl leading-tight text-cream sm:text-4xl md:text-6xl">{headline}</h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-cream">{subhead}</p>
+          <p className="mt-3 text-sm text-cream">{credit}</p>
         </div>
 
-        <div className="mt-10 max-w-2xl">
+        <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-caramel">
             {String(index + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
           </p>
-          <h2 className="mt-2 font-serif text-2xl leading-tight sm:text-3xl md:text-4xl">{name}</h2>
-          <p className="mt-3 max-w-xl text-base leading-7 text-cream/90">{slide.summary}</p>
-          <p className="mt-3 text-sm font-semibold text-caramel">{slide.capacityLabel}</p>
+          <h2 className="mt-2 text-balance font-serif text-2xl leading-tight text-cream sm:text-3xl md:text-4xl">{name}</h2>
+          <p className="mt-3 text-base leading-7 text-cream">{slide.summary}</p>
+          <ol className="mt-4 space-y-3">
+            {lines.map((line, lineIndex) => (
+              <li
+                key={line.label}
+                className={`border-l-2 pl-3 ${lineIndex === activeLine ? "border-caramel" : "border-cream/45"}`}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-caramel">{line.label}</p>
+                <p className="mt-1 text-sm leading-6 text-cream">{line.text}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-4 text-sm font-semibold text-caramel">{slide.capacityLabel}</p>
           {uses.length > 0 ? (
-            <ul className="mt-4 flex flex-wrap gap-2">
+            <ul className="mt-3 flex flex-wrap gap-2">
               {uses.map((use) => (
-                <li key={use} className="rounded-full bg-white/15 px-3 py-1 text-sm text-cream">
+                <li key={use} className="rounded-full bg-charcoal/80 px-3 py-1 text-sm text-cream ring-1 ring-cream/30">
                   {use}
                 </li>
               ))}
@@ -192,36 +243,41 @@ export function HeroReel({
               Get Quote
             </Link>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap" role="tablist" aria-label="Choose a featured machine">
-            {slides.map((item, itemIndex) => (
-              <button
-                key={item.slug}
-                type="button"
-                role="tab"
-                aria-selected={itemIndex === index}
-                aria-label={`Show ${displayName(item.name)}`}
-                className="inline-flex h-11 w-11 items-center justify-center"
-                onClick={() => show(itemIndex)}
-              >
-                <span className={`block h-2.5 rounded-full ${itemIndex === index ? "w-8 bg-caramel" : "w-2.5 bg-cream/50"}`} />
+          <div className="mt-6 flex flex-col gap-3">
+            <div className="flex flex-wrap" role="tablist" aria-label="Choose a machine">
+              {slides.map((item, itemIndex) => (
+                <button
+                  key={item.slug}
+                  type="button"
+                  role="tab"
+                  aria-selected={itemIndex === index}
+                  aria-label={`Show ${displayName(item.name)}`}
+                  className="inline-flex h-11 w-11 items-center justify-center"
+                  onClick={() => show(itemIndex)}
+                >
+                  <span className={`block h-2.5 rounded-full ${itemIndex === index ? "w-8 bg-caramel" : "w-2.5 bg-cream/70"}`} />
+                </button>
+              ))}
+            </div>
+            <div className={`grid gap-2 ${allowMotion ? "grid-cols-3" : "grid-cols-2"}`}>
+              {allowMotion ? (
+                <button
+                  type="button"
+                  className="btn btn-line-light w-full px-2"
+                  aria-pressed={manualPause}
+                  onClick={() => setManualPause((value) => !value)}
+                >
+                  {manualPause ? "Play" : "Pause"}
+                </button>
+              ) : null}
+              <button type="button" className="btn btn-line-light w-full px-2" aria-label="Previous machine" onClick={() => show(index - 1)}>
+                Previous
               </button>
-            ))}
-          </div>
-          <div className="grid grid-cols-3 gap-2 sm:flex">
-            {reduce ? null : (
-              <button type="button" className="btn btn-line-light px-3" aria-pressed={manualPause} onClick={() => setManualPause((value) => !value)}>
-                {manualPause ? "Play" : "Pause"}
+              <button type="button" className="btn btn-line-light w-full px-2" aria-label="Next machine" onClick={() => show(index + 1)}>
+                Next
               </button>
-            )}
-            <button type="button" className="btn btn-line-light px-3" aria-label="Previous machine" onClick={() => show(index - 1)}>
-              Previous
-            </button>
-            <button type="button" className="btn btn-line-light px-3" aria-label="Next machine" onClick={() => show(index + 1)}>
-              Next
-            </button>
+            </div>
           </div>
         </div>
       </div>

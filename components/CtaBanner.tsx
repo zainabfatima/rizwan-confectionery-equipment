@@ -3,7 +3,7 @@ import { site } from "@/config/site";
 
 export function CtaBanner({
   title = "Tell us the candy you want to run.",
-  body = "Send the product, the piece weight, and the hourly output. We will answer with the MEMAK frames that fit a US plant — and we will say so if a machine is the wrong size.",
+  body = "Send the product, the piece weight, and the hourly output. We will answer with the machines that fit a US plant — and we will say so if a machine is the wrong size.",
 }: {
   title?: string;
   body?: string;

@@ -56,6 +56,10 @@ summary::-webkit-details-marker {
   animation: hero-progress 6s linear forwards;
 }
 
+.hero-crossfade {
+  transition: opacity 1.2s ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -64,6 +68,10 @@ summary::-webkit-details-marker {
   .hero-kenburns,
   .hero-progress {
     animation: none;
+  }
+
+  .hero-crossfade {
+    transition: none;
   }
 }
 

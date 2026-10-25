@@ -12,9 +12,9 @@ import { pageMeta } from "@/lib/seo";
 export function generateMetadata() {
   const hero = getFeaturedMachines()[0]?.images[0];
   return pageMeta({
-    title: "Chocolate Moulding Machines & Candy Lines USA | Rizwan Confectionery Equipment",
+    title: "Chocolate, Gummy, Caramel, Nougat and Bar Machines | Rizwan Confectionery Equipment",
     description:
-      "MEMAK USA partner for chocolate moulding, gummy depositors, caramel and nougat lines, chocolate enrobing, and turnkey candy production. Request a US quote.",
+      "Rizwan Confectionery Equipment for US plants. Chocolate, gummy and jelly, caramel, nougat, and bar machines, with what each line makes and the output it is quoted at.",
     path: "/",
     absoluteTitle: true,
     image: hero?.src,
@@ -37,6 +37,7 @@ export default function HomePage() {
             summary: machine.summary,
             capacityLabel: machine.capacityLabel,
             applications: machine.applications,
+            features: machine.features,
             images: machine.images.map((image) => ({ src: image.src, alt: image.alt })),
             video: machine.videos[0] ?? null,
           }),
@@ -44,12 +45,13 @@ export default function HomePage() {
         eyebrow={site.hero.eyebrow}
         headline={site.hero.headline}
         subhead={site.hero.subhead}
+        credit={site.hero.credit}
       />
 
       <section className="border-b border-chocolate/10 bg-white" aria-label="Manufacturer context">
         <ul className="mx-auto grid max-w-page gap-4 px-4 py-6 text-sm sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["Since 1997", "MEMAK machinery"],
+            ["Since 1997", "Factory-built equipment"],
             ["120+ countries", "Manufacturer installed base"],
             ["Turnkey lines", "Kitchen through wrapping"],
             ["US support", "Quote, install, parts"],
@@ -123,7 +125,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-page px-4 py-16 md:py-24">
-        <h2 className="font-serif text-4xl text-chocolate">Why MEMAK</h2>
+        <h2 className="font-serif text-4xl text-chocolate">Why these machines</h2>
         <ul className="mt-8 grid gap-5 md:grid-cols-3">
           {whyMemak.map((item) => (
             <li key={item.title} className="card p-6">
