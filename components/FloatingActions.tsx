@@ -13,18 +13,18 @@ export function FloatingActions({ machines }: { machines: Machine[] }) {
 
   return (
     <>
-      <div className="fixed bottom-24 right-4 z-40 flex flex-col items-end gap-2 md:bottom-6">
+      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-chocolate/10 bg-cream/95 p-3 shadow-card md:inset-x-auto md:bottom-6 md:right-4 md:flex-col md:items-end md:border-0 md:bg-transparent md:p-0 md:shadow-none">
         {whatsapp ? (
           <a
             href={whatsapp}
-            className="btn btn-dark shadow-card"
+            className="btn btn-dark flex-1 shadow-card md:flex-none"
             target="_blank"
             rel="noopener noreferrer"
           >
             WhatsApp
           </a>
         ) : null}
-        <button type="button" className="btn btn-primary shadow-card" onClick={() => setOpen(true)}>
+        <button type="button" className="btn btn-primary flex-1 shadow-card md:flex-none" onClick={() => setOpen(true)}>
           Ask a Question
         </button>
       </div>

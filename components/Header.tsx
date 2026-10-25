@@ -20,10 +20,17 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-chocolate/10 bg-cream/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-chocolate/10 bg-cream/95 backdrop-blur">
+      <div className="flex h-1.5" aria-hidden="true">
+        <span className="flex-1 bg-bean" />
+        <span className="flex-1 bg-berry" />
+        <span className="flex-1 bg-caramel" />
+        <span className="flex-1 bg-nougat" />
+        <span className="flex-1 bg-cereal" />
+      </div>
       <div className="hidden border-b border-chocolate/10 md:block">
         <div className="mx-auto flex max-w-page items-center justify-between px-4 py-2 text-xs tracking-wide text-cocoa">
-          <p>US installation support · Spare parts · Confectionery equipment only</p>
+          <p>Chocolate · Gummy & jelly · Caramel · Nougat · Bars</p>
           <a className="font-medium underline decoration-caramel/60 underline-offset-2" href={`mailto:${site.email}`}>
             {site.email}
           </a>

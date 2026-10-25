@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="font-sans antialiased">
+      <body className="pb-20 font-sans antialiased md:pb-0">
         <JsonLd data={organizationJsonLd()} />
         <a
           href="#main"

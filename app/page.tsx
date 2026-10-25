@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { CtaBanner } from "@/components/CtaBanner";
 import { FeaturedCarousel } from "@/components/FeaturedCarousel";
-import { MachineImage } from "@/components/MachineImage";
+import { HeroReel, type HeroSlide } from "@/components/HeroReel";
 import { Reveal } from "@/components/Reveal";
 import { site } from "@/config/site";
-import { processSteps, testimonials, whyMemak, whyUs } from "@/data/home";
-import { categoriesWithMachines, getFeaturedMachines } from "@/lib/machines";
+import { finishedProducts, processSteps, testimonials, whyMemak, whyUs } from "@/data/home";
+import { categoriesWithMachines, getFeaturedMachines, machinesInCategory } from "@/lib/machines";
+import type { CatalogSlide } from "@/components/FeaturedCarousel";
 import { pageMeta } from "@/lib/seo";
 
 export function generateMetadata() {
@@ -13,7 +14,7 @@ export function generateMetadata() {
   return pageMeta({
     title: "Chocolate Moulding Machines & Candy Lines USA | Rizwan Confectionery Equipment",
     description:
-      "MEMAK USA partner for chocolate moulding machines, gummy depositors, chocolate enrobing, and turnkey candy production lines. Request a US quote.",
+      "MEMAK USA partner for chocolate moulding, gummy depositors, caramel and nougat lines, chocolate enrobing, and turnkey candy production. Request a US quote.",
     path: "/",
     absoluteTitle: true,
     image: hero?.src,
@@ -23,7 +24,6 @@ export function generateMetadata() {
 
 export default function HomePage() {
   const featured = getFeaturedMachines();
-  const hero = featured[0]?.images[0];
   const categories = categoriesWithMachines();
 
   return (
@@ -43,6 +43,16 @@ export default function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-caramel">{site.hero.eyebrow}</p>
           <h1 className="mt-4 max-w-3xl font-serif text-4xl leading-tight md:text-6xl">{site.hero.headline}</h1>
           <p className="mt-5 max-w-2xl text-lg text-cream/85">{site.hero.subhead}</p>
+          <ul className="mt-6 flex flex-wrap gap-2" aria-label="Confectionery types">
+            {finishedProducts.map((product) => (
+              <li key={product.label}>
+                <a href={product.href} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm text-cream ring-1 ring-cream/30 hover:bg-white/20">
+                  <span className={`h-2.5 w-2.5 rounded-full ${product.swatch}`} aria-hidden="true" />
+                  {product.label}
+                </a>
+              </li>
+            ))}
+          </ul>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/machines" className="btn btn-primary">
               {site.hero.primaryCta}
@@ -70,38 +80,63 @@ export default function HomePage() {
         </ul>
       </section>
 
-      <section className="mx-auto max-w-page px-4 py-16 md:py-24">
-        <Reveal>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cocoa">Catalog</p>
-          <h2 className="mt-2 font-serif text-4xl text-chocolate">Confectionery categories</h2>
-          <p className="mt-3 max-w-2xl text-charcoal/80">
-            Chocolate, gummy, caramel, nougat, and bar equipment. Every card opens a machine that was imported from the manufacturer’s confectionery range.
-          </p>
-        </Reveal>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => (
-            <li key={category.slug}>
-              <Link href={`/machines/${category.slug}`} className="card block h-full p-5 transition hover:-translate-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-caramel">
-                  {category.count} {category.count === 1 ? "machine" : "machines"}
-                </p>
-                <h3 className="mt-2 font-serif text-2xl text-chocolate">{category.label}</h3>
-                <p className="mt-2 text-sm leading-6 text-charcoal/80">{category.short}</p>
-              </Link>
+      <section className="mx-auto max-w-page px-4 pt-16" aria-label="Finished products">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cocoa">What the plant makes</p>
+        <h2 className="mt-2 font-serif text-4xl text-chocolate">Five confectionery families</h2>
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {finishedProducts.map((product) => (
+            <li key={product.label}>
+              <a href={product.href} className="card flex h-full flex-col p-5 hover:-translate-y-1">
+                <span className={`h-1.5 w-12 rounded-full ${product.swatch}`} aria-hidden="true" />
+                <span className="mt-4 font-serif text-2xl text-chocolate">{product.label}</span>
+                <span className="mt-2 text-sm leading-6 text-charcoal/80">{product.note}</span>
+              </a>
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="bg-white py-16 md:py-24">
-        <div className="mx-auto max-w-page px-4">
-          <h2 className="font-serif text-4xl text-chocolate">Featured machines</h2>
+      <section className="mx-auto max-w-page px-4 py-16 md:py-20" aria-labelledby="selling-slider-heading">
+        <Reveal>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cocoa">What we sell</p>
+          <h2 id="selling-slider-heading" className="mt-2 font-serif text-4xl text-chocolate">
+            Every category, every machine
+          </h2>
           <p className="mt-3 max-w-2xl text-charcoal/80">
-            A short list for buyers comparing a chocolate moulding machine, an enrober, a tempering unit, or a gummy line.
+            The full confectionery range, grouped by job. Each card shows the machine, a short description, the published output, and what it is used for.
           </p>
-          <div className="mt-8">
-            <FeaturedCarousel machines={featured} />
-          </div>
+        </Reveal>
+        <div className="mt-12 space-y-14">
+          {categories.map((category, index) => {
+            const slides: CatalogSlide[] = machinesInCategory(category.slug).map((machine) => ({
+              slug: machine.slug,
+              category: machine.category,
+              name: machine.name,
+              summary: machine.summary,
+              capacityLabel: machine.capacityLabel,
+              applications: machine.applications,
+              image: machine.images[0] ? { src: machine.images[0].src, alt: machine.images[0].alt } : null,
+            }));
+            return (
+              <section key={category.slug} aria-labelledby={`category-${category.slug}`}>
+                <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+                  <div className="max-w-2xl">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-cocoa">
+                      {String(index + 1).padStart(2, "0")} · {category.count} {category.count === 1 ? "machine" : "machines"}
+                    </p>
+                    <h3 id={`category-${category.slug}`} className="mt-1 font-serif text-3xl text-chocolate">
+                      {category.label}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-charcoal/80">{category.short}</p>
+                  </div>
+                  <Link href={`/machines/${category.slug}`} className="text-sm font-semibold text-cocoa underline-offset-4 hover:underline">
+                    Open {category.label}
+                  </Link>
+                </div>
+                <FeaturedCarousel machines={slides} label={category.label} />
+              </section>
+            );
+          })}
         </div>
       </section>
 
@@ -117,7 +152,7 @@ export default function HomePage() {
         </ul>
       </section>
 
-      <section className="bg-cocoa py-16 text-cream md:py-24">
+      <section className="bg-chocolate py-16 text-cream md:py-24">
         <div className="mx-auto max-w-page px-4">
           <h2 className="font-serif text-4xl">Why buy through us</h2>
           <ul className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">

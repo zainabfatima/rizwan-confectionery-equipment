@@ -28,7 +28,7 @@ export function Gallery({ images, name }: { images: Photo[]; name: string }) {
     <div>
       <button
         type="button"
-        className="relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#f3ebe3]"
+        className="relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#e7eef0]"
         onClick={() => setOpen(true)}
         aria-label={`Open larger photo of ${name}`}
       >

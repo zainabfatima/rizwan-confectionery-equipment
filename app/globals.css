@@ -8,12 +8,15 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
-  background-color: #faf5ee;
-  background-image: radial-gradient(ellipse at top, rgba(200, 137, 59, 0.14), transparent 46%);
-  color: #1f1f1f;
+  background-color: #f4f7f6;
+  background-image:
+    radial-gradient(ellipse at top left, rgba(194, 59, 90, 0.08), transparent 32%),
+    radial-gradient(ellipse at top right, rgba(227, 178, 60, 0.16), transparent 42%);
+  color: #172126;
 }
 
 summary::-webkit-details-marker {
@@ -21,27 +24,60 @@ summary::-webkit-details-marker {
 }
 
 :focus-visible {
-  outline: 2px solid #c8893b;
+  outline: 2px solid #0e2a33;
   outline-offset: 3px;
+}
+
+@keyframes hero-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes hero-progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.hero-kenburns {
+  animation: hero-kenburns 7s ease-out forwards;
+}
+
+.hero-progress {
+  height: 100%;
+  background: #e3b23c;
+  animation: hero-progress 6s linear forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
+
+  .hero-kenburns,
+  .hero-progress {
+    animation: none;
+  }
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition duration-200;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold tracking-wide transition duration-200;
   }
 
   .btn-primary {
-    @apply bg-caramel text-chocolate hover:bg-[#d6a15a];
+    @apply bg-caramel text-chocolate hover:bg-[#f0c85a];
   }
 
   .btn-dark {
-    @apply bg-chocolate text-cream hover:bg-cocoa;
+    @apply bg-chocolate text-cream hover:bg-[#1a4452];
   }
 
   .btn-line {

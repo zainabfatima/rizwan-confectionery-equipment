@@ -1,15 +1,48 @@
+export const finishedProducts = [
+  {
+    label: "Chocolate",
+    href: "#category-chocolate-moulding",
+    note: "Moulding, tempering, mills, enrobing",
+    swatch: "bg-bean",
+  },
+  {
+    label: "Gummy & jelly",
+    href: "#category-soft-candy-jelly",
+    note: "Cooking, depositing, sugaring",
+    swatch: "bg-berry",
+  },
+  {
+    label: "Caramel",
+    href: "#category-candy-cooking",
+    note: "Cookers, mixers, ropes, and slabs",
+    swatch: "bg-caramel",
+  },
+  {
+    label: "Nougat",
+    href: "#category-bar-nougat",
+    note: "Continuous mix and slab forming",
+    swatch: "bg-nougat",
+  },
+  {
+    label: "Bars",
+    href: "#category-enrobing",
+    note: "Forming, coating, and cooling",
+    swatch: "bg-cereal",
+  },
+] as const;
+
 export const whyMemak = [
   {
     title: "Building lines since 1997",
     body: "MEMAK’s first machine left the shop in 1997. The confectionery range quoted here comes from that same manufacturer, now operating a large Konya plant and supplying equipment that runs in more than 120 countries.",
   },
   {
-    title: "Turnkey, not a loose catalog",
-    body: "A moulding frame still needs melting, refining, tempering, cooling, and wrapping. We scope those steps as one line so the shot rate you buy is a rate the kitchen can actually feed.",
+    title: "A line, not a single frame",
+    body: "A gummy still needs a cooker. A bar still needs a slab, a coater, and a tunnel. A tablet still needs melting, refining, and temper. We scope those steps together so the rate you buy is a rate the kitchen can feed.",
   },
   {
-    title: "Confectionery only",
-    body: "This desk covers chocolate, gummy and jelly, caramel, nougat, and bar equipment. Bakery ovens, biscuit lines, and cake plants are a different MEMAK range and are not sold here.",
+    title: "The whole candy plant",
+    body: "Chocolate, gummy and jelly, caramel, nougat, and bars are all in this catalog, including the depositors, cookers, coaters, and wrappers around them. Bakery ovens, biscuit lines, and cake plants are a different MEMAK range and are not sold here.",
   },
 ];
 
@@ -36,7 +69,7 @@ export const processSteps = [
   {
     step: "01",
     title: "Consult",
-    body: "Share the product, the piece weight, and the hourly output you need. We narrow the MEMAK frames that can actually hit that duty.",
+    body: "Tell us the candy — chocolate, gummy, caramel, nougat, or bar — plus piece weight and the hourly output. We narrow the MEMAK frames that can hit that duty.",
   },
   {
     step: "02",

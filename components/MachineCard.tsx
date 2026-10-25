@@ -10,7 +10,7 @@ export function MachineCard({ machine, priority = false }: { machine: Machine; p
   return (
     <HoverLift className="h-full">
       <article className="card flex h-full flex-col overflow-hidden">
-        <Link href={href} className="relative block aspect-[4/3] bg-[#f3ebe3]">
+        <Link href={href} className="relative block aspect-[4/3] bg-[#e7eef0]">
           {image ? (
             <MachineImage
               src={image.src}

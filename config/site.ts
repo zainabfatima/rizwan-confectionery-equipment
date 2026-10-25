@@ -4,7 +4,7 @@ export const site = {
   partner: "MEMAK",
   partnerLegal: "Memak Machinery",
   description:
-    "Authorized MEMAK confectionery equipment for North America — chocolate moulding, gummy depositors, enrobing, and turnkey candy production lines.",
+    "Authorized MEMAK confectionery equipment for North America — chocolate, gummy and jelly, caramel, nougat, bar lines, and the kitchen machines that feed them.",
   email: "info@rizwanconfectionery.com",
   phoneDisplay: "+1 (555) 014-0197",
   phoneHref: "tel:+15550140197",
@@ -24,7 +24,7 @@ export const site = {
     eyebrow: "North American partner for MEMAK confectionery machinery",
     headline: "Authorized MEMAK Confectionery Equipment for North America",
     subhead:
-      "Chocolate moulding, gummy and jelly lines, enrobing, and turnkey candy production — quoted, installed, and supported in the United States. Bakery and biscuit ovens are outside this range.",
+      "Lines and stand-alone machines for chocolate, gummy and jelly, caramel, nougat, and bars — from cooking and depositing through enrobing, cooling, and wrapping. Quoted, installed, and supported for US plants. Bakery and biscuit ovens are outside this range.",
     primaryCta: "Browse Machines",
     secondaryCta: "Request a Quote",
   },
