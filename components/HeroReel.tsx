@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useReducedMotion } from "framer-motion";
 import { MachineImage } from "@/components/MachineImage";
 
 export type HeroSlide = {
@@ -57,6 +56,21 @@ function videoKind(url: string) {
   return null;
 }
 
+function useReduceMotion() {
+  const [reduce, setReduce] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduce(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  return reduce;
+}
+
+const SLIDE_MS = 2800;
+const PHOTO_MS = 1200;
+
 function explanationLines(slide: HeroSlide) {
   const does = slide.features.find((feature) => feature.trim()) || slide.summary;
   const uses = slide.applications.map((item) => item.trim()).filter(Boolean).slice(0, 4);
@@ -79,14 +93,13 @@ export function HeroReel({
   subhead: string;
   credit: string;
 }) {
-  const reduce = useReducedMotion();
-  const allowMotion = reduce === false;
+  const reduce = useReduceMotion();
+  const allowMotion = !reduce;
   const [index, setIndex] = useState(0);
   const [photo, setPhoto] = useState(0);
   const [beat, setBeat] = useState(0);
   const [manualPause, setManualPause] = useState(false);
-  const [hoverPause, setHoverPause] = useState(false);
-  const paused = !allowMotion || manualPause || hoverPause;
+  const paused = reduce || manualPause;
   const slide = slides[index];
 
   useEffect(() => {
@@ -95,7 +108,7 @@ export function HeroReel({
       setIndex((current) => (current + 1) % slides.length);
       setPhoto(0);
       setBeat(0);
-    }, 6000);
+    }, SLIDE_MS);
     return () => window.clearInterval(timer);
   }, [paused, slides.length]);
 
@@ -107,7 +120,7 @@ export function HeroReel({
     const timer = window.setInterval(() => {
       setBeat((value) => value + 1);
       if (!hasVideo && count > 1) setPhoto((currentPhoto) => (currentPhoto + 1) % count);
-    }, 3000);
+    }, PHOTO_MS);
     return () => window.clearInterval(timer);
   }, [paused, index, slides]);
 
@@ -126,10 +139,6 @@ export function HeroReel({
     setIndex((next + slides.length) % slides.length);
   }
 
-  function hold(node: HTMLElement, active: boolean) {
-    setHoverPause(active || node.contains(document.activeElement));
-  }
-
   return (
     <section
       className="relative isolate overflow-x-clip bg-charcoal text-cream md:min-h-[calc(100svh-7.5rem)]"
@@ -137,10 +146,6 @@ export function HeroReel({
       aria-roledescription="carousel"
       aria-label="Machines in motion"
       tabIndex={0}
-      onMouseEnter={(event) => hold(event.currentTarget, true)}
-      onMouseLeave={(event) => hold(event.currentTarget, false)}
-      onFocusCapture={(event) => hold(event.currentTarget, true)}
-      onBlurCapture={(event) => hold(event.currentTarget, false)}
       onKeyDown={(event) => {
         if (event.key === "ArrowRight") {
           event.preventDefault();
@@ -176,8 +181,9 @@ export function HeroReel({
             <source src={playback.src} />
           </video>
         ) : null}
-        {!playback
-          ? slide.images.map((image, imageIndex) => {
+        {!playback ? (
+          <div key={slide.slug} className={`absolute inset-0 ${allowMotion ? "hero-kenburns" : ""}`}>
+            {slide.images.map((image, imageIndex) => {
               const active = imageIndex === photo;
               return (
                 <div
@@ -190,12 +196,13 @@ export function HeroReel({
                     alt=""
                     sizes="100vw"
                     priority={index === 0 && imageIndex === 0}
-                    className={`object-cover object-center ${active && allowMotion ? "hero-kenburns" : ""}`}
+                    className="object-cover object-center"
                   />
                 </div>
               );
-            })
-          : null}
+            })}
+          </div>
+        ) : null}
       </div>
       <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-charcoal/88 to-charcoal/30" />
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-charcoal to-transparent" />
